@@ -8,14 +8,6 @@ bbq_logger = logging.getLogger('bbq')
 
 class TempSensor():
     __metaclass__ = ABCMeta
-    name = "noname"
-
-    class TYPE(Enum):
-        PIT = 0
-        FOOD = 1
-        AMBIENT = 2
-        FIRE = 3
-        OTHER= 4
 
     class TempSensorError(Exception):
         """Base class for tempature sensor exceptions"""
@@ -43,12 +35,6 @@ class AirControl():
     minimum = 0
     maximum = 100
     step = 5
-
-    class TYPE(Enum):
-        INTAKE = 0
-        EXHAUST = 1
-        INTERSTITIAL = 2
-        OTHER = 3
 
     @abstractmethod
     def getValue(self):
@@ -97,25 +83,6 @@ class ControlAlgorithm():
                          self.bbq.temp,
                          self.bbq.airValue))
 
-    def isTimeThresholdExceeded(self, start):
-        timeSince = (datetime.datetime.now() - self.overflowStart).seconds
-        if (timeSince > self.overunderflowTimeThreshold):
-            return True
-            return False
-
-    # FIXME: surely we can do better
-    # too many variables
-    # not DRY enough for the other way
-    def isOverflowing(self):
-        if ((self.bbq.temp > self.goalTemp + self.overflowThreshold) and
-            (self.bbq.airValue == self.airControl.maximum)):
-            if (self.overflowStart == None):
-                self.overflowStart = datetime.datetime.now()
-                if self.isTimeThresholdExceeded(self.overflowStart):
-                    return True
-                else:
-                    self.overflowStart = None
-                    return False
 
     def runIteration(self):
         self.log()
